@@ -14,4 +14,45 @@ spring:
 # 日志配置
 logging:
   level:
-    org.springframework.cloud.gateway: debug 
+    org.springframework.cloud.gateway: debug
+    com.yuwang.leyuegateway: info
+  pattern:
+    console: '%d{yyyy-MM-dd HH:mm:ss.SSS} %clr([%5level]) %clr([traceId=%X{traceId:-N/A} spanId=%X{spanId:-N/A}]){cyan} %clr([%15.15thread]){magenta} %clr(%-40.40logger{39}){blue} %clr(:){faint} %m%n'
+
+# 管理端点配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,gateway
+  endpoint:
+    health:
+      show-details: always
+    gateway:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+      
+# Gateway追踪配置
+gateway:
+  tracing:
+    enabled: true
+    # 采样配置
+    sampling:
+      rate: 1.0  # 开发环境100%采样，生产环境建议0.01-0.1
+    # 协议支持配置
+    protocol:
+      # 输入协议（网关接受的格式）
+      input:
+        - w3c          # W3C Trace Context
+        - b3           # B3 协议
+        - custom       # 自定义X-Trace-Id
+        - legacy       # 传统traceId头
+      # 输出协议（向下游发送的格式）
+      output: w3c      # 统一使用W3C格式
+    # 日志配置
+    logging:
+      level: info      # trace, debug, info, warn, error
+      include-headers: true
+      include-timing: true 
